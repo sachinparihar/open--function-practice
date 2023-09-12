@@ -10,7 +10,7 @@ const (
 	Name    = "plugin-custom"
 	Version = "v1"
 )
-s
+
 type PluginCustom struct {
 	PluginName    string
 	PluginVersion string
