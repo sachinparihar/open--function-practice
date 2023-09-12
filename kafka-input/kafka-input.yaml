@@ -1,0 +1,74 @@
+apiVersion: core.openfunction.io/v1beta2
+kind: Function
+metadata:
+  name: kafka-input
+  namespace: default
+spec:
+  build:
+    builder: openfunction/builder-go:latest
+    env:
+      FUNC_CLEAR_SOURCE: "true"
+      FUNC_NAME: HandleKafkaInput
+      #      # Use FUNC_GOPROXY to set the goproxy if failed to fetch go modules
+      #      FUNC_GOPROXY: "https://goproxy.cn"
+    srcRepo:
+      revision: main
+      sourceSubPath: functions/async/bindings/kafka-input
+      url: https://github.com/OpenFunction/samples.git
+  image: sachinparihar/kafka-input:v1
+  imageCredentials:
+    name: push-secret
+  serving:
+    bindings:
+      target-topic:
+        ignoreErrors: false
+        initTimeout: ""
+        metadata:
+          - name: brokers
+            value: kafka-server-kafka-brokers:9092
+          - name: topics
+            value: sample-topic
+          - name: consumerGroup
+            value: kafka-input
+          - name: publishTopic
+            value: sample-topic
+          - name: authRequired
+            value: "false"
+        type: bindings.kafka
+        version: v1
+    scaleOptions:
+      keda:
+        scaledObject:
+          advanced:
+            horizontalPodAutoscalerConfig:
+              behavior:
+                scaleDown:
+                  policies:
+                    - periodSeconds: 15
+                      type: Percent
+                      value: 50
+                  stabilizationWindowSeconds: 45
+                scaleUp:
+                  stabilizationWindowSeconds: 0
+          cooldownPeriod: 60
+          pollingInterval: 15
+        triggers:
+          - metadata:
+              bootstrapServers: kafka-server-kafka-brokers.default.svc:9092
+              consumerGroup: kafka-input
+              lagThreshold: "20"
+              topic: sample-topic
+            type: kafka
+      maxReplicas: 10
+      minReplicas: 0
+    template:
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: function
+    triggers:
+      dapr:
+        - name: target-topic
+          type: bindings.kafka
+    workloadType: Deployment
+  version: v1.0.0
+  workloadRuntime: OCIContainer
