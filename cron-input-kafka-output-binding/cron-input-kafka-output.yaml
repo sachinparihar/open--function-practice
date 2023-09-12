@@ -1,0 +1,66 @@
+apiVersion: core.openfunction.io/v1beta2
+kind: Function
+metadata:
+  name: cron-input-kafka-output
+  namespace: default
+spec:
+  build:
+    builder: openfunction/builder-go:latest
+    env:
+      FUNC_CLEAR_SOURCE: "true"
+      FUNC_NAME: HandleCronInput
+    #      # Use FUNC_GOPROXY to set the goproxy if failed to fetch go modules
+    #      FUNC_GOPROXY: "https://goproxy.cn"
+    srcRepo:
+      revision: main
+      sourceSubPath: functions/async/bindings/cron-input-kafka-output
+      url: https://github.com/OpenFunction/samples.git
+  image: sachinparihar/cron-input-kafka-output:v1
+  imageCredentials:
+    name: push-secret
+  serving:
+    bindings:
+      cron:
+        metadata:
+          - name: schedule
+            value: '@every 2s'
+        type: bindings.cron
+        version: v1
+      kafka-server:
+        ignoreErrors: false
+        initTimeout: ""
+        metadata:
+          - name: brokers
+            value: kafka-server-kafka-brokers:9092
+          - name: topics
+            value: sample-topic
+          - name: consumerGroup
+            value: bindings-with-output
+          - name: publishTopic
+            value: sample-topic
+          - name: authRequired
+            value: "false"
+        type: bindings.kafka
+        version: v1
+    hooks:
+      post:
+        - plugin-custom
+        - plugin-example
+      pre:
+        - plugin-example
+        - plugin-custom
+    outputs:
+      - dapr:
+          name: kafka-server
+          operation: create
+          type: bindings.kafka
+    template:
+      containers:
+        - imagePullPolicy: IfNotPresent
+          name: function
+    triggers:
+      dapr:
+        - name: cron
+          type: bindings.cron
+  version: v2.0.0
+  workloadRuntime: OCIContainer
