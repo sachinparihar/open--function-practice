@@ -13,8 +13,8 @@ spec:
     #      FUNC_GOPROXY: "https://goproxy.cn"
     srcRepo:
       revision: main
-      sourceSubPath: functions/async/bindings/cron-input-kafka-output
-      url: https://github.com/OpenFunction/samples.git
+      sourceSubPath: cron-input-kafka-output-binding
+      url: https://github.com/sachinparihar/open-function-practice.git
   image: sachinparihar/cron-input-kafka-output:v1
   imageCredentials:
     name: push-secret

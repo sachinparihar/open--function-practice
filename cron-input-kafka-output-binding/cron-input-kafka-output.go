@@ -1,7 +1,7 @@
 package bindings
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 
 	ofctx "github.com/OpenFunction/functions-framework-go/context"
@@ -23,7 +23,14 @@ func HandleCronInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 			return ctx.ReturnOnInternalError(), err
 		}
 	} else {
+
 		log.Print("binding - Data: no input provided")
+    
+		log.Print("binding - Data: counting 1 to n")
+		n := 10
+		for i := 1; i <= n; i++ {
+			greeting = append(greeting, []byte(fmt.Sprintf("%d\n", i))...)
+		}
 	}
 
 	_, err := ctx.Send("kafka-server", greeting)

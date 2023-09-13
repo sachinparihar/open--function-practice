@@ -13,8 +13,8 @@ spec:
       #      FUNC_GOPROXY: "https://goproxy.cn"
     srcRepo:
       revision: main
-      sourceSubPath: functions/async/bindings/kafka-input
-      url: https://github.com/OpenFunction/samples.git
+      sourceSubPath: kafka-input
+      url: https://github.com/sachinparihar/open-function-practice.git
   image: sachinparihar/kafka-input:v1
   imageCredentials:
     name: push-secret
