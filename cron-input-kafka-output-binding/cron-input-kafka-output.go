@@ -12,7 +12,6 @@ type Message struct {
 }
 
 func HandleCronInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
-	var greeting []byte
 	if in != nil {
 		log.Printf("binding - Data: %s", in)
 		n := 10
@@ -26,14 +25,18 @@ func HandleCronInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 			log.Printf("Error: %v\n", err)
 			return ctx.ReturnOnInternalError(), err
 		}
+		_, err = ctx.Send("kafka-server", greeting)
+		if err != nil {
+			log.Printf("Error: %v\n", err)
+			return ctx.ReturnOnInternalError(), err
+		}
 	} else {
 		log.Print("binding - Data: no input provided")
-	}
-
-	_, err := ctx.Send("kafka-server", greeting)
-	if err != nil {
-		log.Printf("Error: %v\n", err)
-		return ctx.ReturnOnInternalError(), err
+		_, err := ctx.Send("kafka-server", []byte("Hello, World!"))
+		if err != nil {
+			log.Printf("Error: %v\n", err)
+			return ctx.ReturnOnInternalError(), err
+		}
 	}
 
 	return ctx.ReturnOnSuccess(), nil
