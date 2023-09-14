@@ -1,4 +1,4 @@
-module main
+module cron.go
 
 go 1.21
 
