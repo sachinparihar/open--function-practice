@@ -1,15 +1,17 @@
-module example.com/bindings
+module main.go
 
-go 1.17
+go 1.21.1
 
-require github.com/OpenFunction/functions-framework-go v0.5.0
+require (
+	github.com/OpenFunction/functions-framework-go v0.5.0
+	github.com/fatih/structs v1.1.0
+)
 
 require (
 	github.com/SkyAPM/go2sky v1.4.1 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.4.1 // indirect
 	github.com/dapr/dapr v1.8.3 // indirect
 	github.com/dapr/go-sdk v1.5.0 // indirect
-	github.com/fatih/structs v1.1.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect

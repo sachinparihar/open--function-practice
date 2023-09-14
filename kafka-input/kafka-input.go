@@ -19,5 +19,5 @@ func HandleKafkaInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 }
 
 type Message struct {
-	Msg string `json:"message"`
+	Msg string `json:"numbers"`
 }
