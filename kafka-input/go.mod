@@ -1,6 +1,6 @@
-module example.com/bindings
+module main.go
 
-go 1.17
+go 1.21.1
 
 require github.com/OpenFunction/functions-framework-go v0.5.0
 
