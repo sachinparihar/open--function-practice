@@ -3,6 +3,12 @@ kind: Function
 metadata:
   name: kafka-input
   namespace: default
+  annotations:
+    openfunction.io/revision-controller: enable
+    openfunction.io/revision-controller-params: |
+      type: source
+      repo-type: github
+      polling-interval: 1m  
 spec:
   build:
     builder: openfunction/builder-go:latest
