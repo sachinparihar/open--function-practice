@@ -1,3 +1,4 @@
+// kafka-input.go
 package bindings
 
 import (
@@ -14,10 +15,12 @@ func HandleKafkaInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 		fmt.Println("error reading message from Kafka binding", err)
 		return ctx.ReturnOnInternalError(), err
 	}
-	fmt.Printf("message from Kafka '%s'\n", msg)
+	for _, number := range msg.Numbers {
+		fmt.Printf("%d\n", number)
+	}
 	return ctx.ReturnOnSuccess(), nil
 }
 
 type Message struct {
-	Msg string `json:"numbers"`
+	Numbers []int `json:"numbers"`
 }

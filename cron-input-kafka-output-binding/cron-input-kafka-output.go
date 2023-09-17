@@ -1,3 +1,4 @@
+// cron-input-kafka-output.go
 package bindings
 
 import (
@@ -6,10 +7,6 @@ import (
 
 	ofctx "github.com/OpenFunction/functions-framework-go/context"
 )
-
-type Message struct {
-	Numbers []int `json:"numbers"`
-}
 
 func HandleCronInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 	if in != nil {
@@ -32,12 +29,11 @@ func HandleCronInput(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 		}
 	} else {
 		log.Print("binding - Data: no input provided")
-		_, err := ctx.Send("kafka-server", []byte("Hello, World!"))
-		if err != nil {
-			log.Printf("Error: %v\n", err)
-			return ctx.ReturnOnInternalError(), err
-		}
 	}
 
 	return ctx.ReturnOnSuccess(), nil
+}
+
+type Message struct {
+	Numbers []int `json:"numbers"`
 }
