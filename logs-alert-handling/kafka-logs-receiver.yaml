@@ -1,11 +1,11 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: kafka-server
+  name: kafka-logs-receiver
   namespace: default
 spec:
   kafka:
-    version: 3.6.0
+    version: 3.4.0
     replicas: 1
     listeners:
       - name: plain
@@ -36,14 +36,13 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
-  name: kafka-topic
+  name: logs
   namespace: default
   labels:
-    strimzi.io/cluster: kafka-server
+    strimzi.io/cluster: kafka-logs-receiver
 spec:
   partitions: 10
-  replicas: 1
+  replicas: 3
   config:
     retention.ms: 7200000
     segment.bytes: 1073741824
-
