@@ -14,7 +14,7 @@ func ForwardToKafka(ctx ofctx.Context, in []byte) (ofctx.Out, error) {
 		greeting = in
 	} else {
 		log.Print("http - Data: Received")
-		greeting, _ = json.Marshal(map[string]string{"message": "Hello"})
+		greeting, _ = json.Marshal(map[string]string{"message": "Hello Sachin Parihar"})
 	}
 
 	_, err := ctx.Send("target", greeting)

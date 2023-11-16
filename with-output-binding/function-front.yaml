@@ -4,7 +4,7 @@ metadata:
   name: function-front
 spec:
   version: "v1.0.0"
-  image: "openfunctiondev/sample-knative-dapr:v1"
+  image: "sachinparihar/sample-knative-dapr:v1"
   imageCredentials:
     name: push-secret
   build:
