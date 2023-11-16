@@ -1,0 +1,57 @@
+apiVersion: core.openfunction.io/v1beta2
+kind: Function
+metadata:
+  name: function-front
+spec:
+  version: "v1.0.0"
+  image: "openfunctiondev/sample-knative-dapr:v1"
+  imageCredentials:
+    name: push-secret
+  build:
+    builder: openfunction/builder-go:latest
+    env:
+      FUNC_NAME: "ForwardToKafka"
+      FUNC_CLEAR_SOURCE: "true"
+#     # Use FUNC_GOPROXY to set the goproxy if failed to fetch go modules
+#     FUNC_GOPROXY: "https://goproxy.cn"
+    srcRepo:
+      url: "https://github.com/sachinparihar/open-function-practice.git"
+      sourceSubPath: "with-output-binding"
+      revision: "main"
+  serving:
+    hooks:
+      post:
+        - plugin-example
+        - plugin-custom
+      pre:
+        - plugin-custom
+        - plugin-example
+    scaleOptions:
+      minReplicas: 0
+      maxReplicas: 5
+    outputs:
+      - dapr:
+          name: kafka-server
+          operation: "create"
+    bindings:
+      kafka-server:
+        type: bindings.kafka
+        version: v1
+        metadata:
+          - name: brokers
+            value: "kafka-server-kafka-brokers:9092"
+          - name: authRequired
+            value: "false"
+          - name: publishTopic
+            value: "sample-topic"
+          - name: topics
+            value: "sample-topic"
+          - name: consumerGroup
+            value: "function-front"
+    template:
+      containers:
+        - name: function # DO NOT change this
+          imagePullPolicy: IfNotPresent
+    triggers:
+      http:
+        port: 8080
