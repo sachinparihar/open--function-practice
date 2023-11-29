@@ -3,61 +3,53 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"os"
-	"strconv"
-	"time"
 )
 
 type WeatherResponse struct {
 	Main struct {
 		Temp float64 `json:"temp"`
 	} `json:"main"`
+	Name string `json:"name"`
 }
 
-func main() {
-	port := 8080
-	if strValue, ok := os.LookupEnv("PORT"); ok {
-		if intValue, err := strconv.Atoi(strValue); err == nil {
-			port = intValue
-		}
+func getWeather(w http.ResponseWriter, r *http.Request) {
+	apiKey := "db9058e7659fb6c7faf51f7523524e45"
+
+	// Get city from the "city" query parameter
+	city := r.URL.Query().Get("city")
+	if city == "" {
+		http.Error(w, "Missing city query parameter", http.StatusBadRequest)
+		return
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Fetch weather data
-		weatherData, err := fetchWeatherData()
-		if err != nil {
-			fmt.Fprintf(w, "Error fetching weather data: %v", err)
-			return
-		}
-
-		// Print current temperature
-		temperature := weatherData.Main.Temp
-		fmt.Fprintf(w, "Current temperature: %.2f°C\n", temperature)
-	})
-
-	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-}
-
-func fetchWeatherData() (*WeatherResponse, error) {
-	apiKey := "6f07d7ad71a5f574d800959ce05b6728"
-	city := "Delhi"
 	url := fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric", city, apiKey)
 
-	client := http.Client{
-		Timeout: time.Second * 5,
-	}
-
-	resp, err := client.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	defer resp.Body.Close()
 
-	var weatherData WeatherResponse
-	if err := json.NewDecoder(resp.Body).Decode(&weatherData); err != nil {
-		return nil, err
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return &weatherData, nil
+	var weatherResponse WeatherResponse
+	err = json.Unmarshal(body, &weatherResponse)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "The temperature in %s is %f degrees Celsius.\n", weatherResponse.Name, weatherResponse.Main.Temp)
+}
+
+func main() {
+	http.HandleFunc("/getweather", getWeather)
+	http.ListenAndServe(":8080", nil)
 }
